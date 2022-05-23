@@ -38,8 +38,7 @@ int main(int argc, char *argv[]) {
     fillUpCube(a, input);
     DecisionTree graph;
     graph.root = a;
-
-    
+    //graph.makeTRnode(a);
      while (!graph.Print()) {
          graph.make_decision(a);
      }
@@ -114,13 +113,68 @@ void makeTestCase (string input[6]) {
     // input[3] = "wwbbrogry";
     // input[4] = "gorowrybo";
     // input[5] = "ogwyygbyr";
+    // //TR
+    // input[0] = "wwwoooooo";
+    // input[1] = "rrrrrryyy";
+    // input[2] = "rrrwwwwww";
+    // input[3] = "oooyyyyyy";
+    // input[4] = "ggggggggg";
+    // input[5] = "bbbbbbbbb";
 
-    input[0] = "rrrrrrbbb";
-    input[1] = "ooogggggg";
-    input[2] = "bbbbbbggg";
-    input[3] = "oooooorrr";
-    input[4] = "wwwwwwwww";
-    input[5] = "yyyyyyyyy";
+    //TL
+    // input[0] = "yyyoooooo";
+    // input[1] = "rrrrrrwww";
+    // input[2] = "ooowwwwww";
+    // input[3] = "rrryyyyyy";
+    // input[4] = "ggggggggg";
+    // input[5] = "bbbbbbbbb";
     
+    //RU
+    // input[0] = "ggoggoggo";
+    // input[1] = "bbrbbrbbr";
+    // input[2] = "wwwwwwwww";
+    // input[3] = "yyyyyyyyy";
+    // input[4] = "rrgrrgrrg";
+    // input[5] = "oobooboob";
+
+     //BR
+    // input[0] = "oooooowww";
+    // input[1] = "yyyrrrrrr";
+    // input[2] = "wwwwwwrrr";
+    // input[3] = "yyyyyyooo";
+    // input[4] = "ggggggggg";
+    // input[5] = "bbbbbbbbb";
+
+    //BL
+    // input[0] = "ooooooyyy";
+    // input[1] = "wwwrrrrrr";
+    // input[2] = "wwwwwwooo";
+    // input[3] = "yyyyyyrrr";
+    // input[4] = "ggggggggg";
+    // input[5] = "bbbbbbbbb";
+
+
+    //FC
+    input[0] = "ooooooooo";
+    input[1] = "rrrrrrrrr";
+    input[2] = "wwbwwbwwb";
+    input[3] = "gyygyygyy";
+    input[4] = "ggggggwww";
+    input[5] = "yyybbbbbb";
+
+    //Complete
+    // input[0] = "ooooooooo";
+    // input[1] = "rrrrrrrrr";
+    // input[2] = "wwwwwwwww";
+    // input[3] = "yyyyyyyyy";
+    // input[4] = "ggggggggg";
+    // input[5] = "bbbbbbbbb";
+
+    // input[0] = "yyyooboob";
+    // input[1] = "rrgrrgwww";
+    // input[2] = "oobwwwwww";
+    // input[3] = "grryyyyyy";
+    // input[4] = "ggggggooo";
+    // input[5] = "bbrbbrbbr";
 }
 

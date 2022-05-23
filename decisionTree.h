@@ -26,6 +26,7 @@ class Element{
     int previousRotate;
     int cube[6][3][3];
     Element *  childs [12];
+    int node_depth;
 
     Element(int rotate) {
         previousRotate = rotate;
@@ -98,44 +99,45 @@ bool DecisionTree::IsEmpty() {
 
 bool DecisionTree::Print() {
     if(inorder_print(root)) {
-        for(int i = 0; i < solution.size(); i++) {
-            cout << "solution found!";
+        cout << "solution found!" <<endl;
+        int temp = solution.size();
+        for(int i = 0; i < temp; i++) {
             switch(solution.front()) {
                 case 6:
-                    cout << "TL";
+                    cout << "TL ";
                     break;
                 case 7:
-                    cout << "TR";
+                    cout << "TR ";
                     break;
                 case 8:
-                    cout << "BL";
+                    cout << "BL ";
                     break;
                 case 9:
-                    cout << "BR";
+                    cout << "BR ";
                     break;
                 case 10:
-                    cout << "RU";
+                    cout << "RU ";
                     break;
                 case 11:
-                    cout << "RD";
+                    cout << "RD ";
                     break;
                 case 12:
-                    cout << "LU";
+                    cout << "LU ";
                     break;
                 case 13:
-                    cout << "LD";
+                    cout << "LD ";
                     break;
                 case 14:
-                    cout << "FC";
+                    cout << "FC ";
                     break;
                 case 15:
-                    cout << "FA";
+                    cout << "FA ";
                     break;
                 case 16:
-                    cout << "BC";
+                    cout << "BC ";
                     break;
                 case 17:
-                    cout << "BA";
+                    cout << "BA ";
                     break;
                 default:
                     cout << "";
@@ -153,19 +155,21 @@ bool DecisionTree::inorder_print(Element* ptr) {
         for (int i = 0; i<12; i++) {
             if (inorder_print(ptr->childs[i])) {
                 solution.push(ptr->previousRotate);
+                //print_cube(ptr);
                 return true;
             }
             if (ptr->childs[i] == NULL) {
                 
                 if (check_cube(ptr)) {
                     solution.push(ptr->previousRotate);
-                    return 1;
+                    //print_cube(ptr);
+                    return true;
                 }
                     
             }
         }
     } 
-    return 0;
+    return false;
     
 }    
 
@@ -183,12 +187,15 @@ bool DecisionTree::check_cube(Element *ptr) {
     return true;
 }
 void DecisionTree::make_decision(Element *ptr) {
-    cout<<"browing "<<depth<<" rotation"<<endl;
+   
+    cout<<"browsing "<<depth<<" rotation"<<endl;
+   
     depth++;
     expand_decision(ptr,1);
 }
 
 void DecisionTree::expand_decision(Element *ptr, int cnt) {
+    
     if (ptr) {
         
         for (int i = 0; i<12; i++) {
@@ -206,11 +213,12 @@ void DecisionTree::extend_branch(Element *ptr) {
             if (ptr->childs[i] == NULL) {
                 switch (i) {
                     case 0:
-                        if (ptr->previousRotate != TL) 
+                        if (ptr->previousRotate != TR) 
                             ptr->childs[i] = makeTRnode(ptr);
+            
                         break;
                     case 1:
-                        if (ptr->previousRotate != TR) 
+                        if (ptr->previousRotate != TL) 
                             ptr->childs[i] = makeTLnode(ptr);
                         break;
                     case 2:
@@ -269,7 +277,6 @@ Element* DecisionTree::makeTRnode(Element *a) {
             }
         }
     }
-    //print_cube(temp);
     swap(temp->cube[FRONT][0], temp->cube[RIGHT][0]);
     swap(temp->cube[FRONT][0], temp->cube[BACK][2]);
     swap(temp->cube[FRONT][0], temp->cube[LEFT][0]);
@@ -282,7 +289,6 @@ Element* DecisionTree::makeTRnode(Element *a) {
     swap(temp->cube[TOP][0][1], temp->cube[TOP][2][1]);
     swap(temp->cube[TOP][0][1], temp->cube[TOP][1][0]);
     temp->previousRotate = TR;
-    //print_cube(temp);
 
     return temp;
 
@@ -297,9 +303,10 @@ Element* DecisionTree::makeTLnode(Element *a) {
             }
         }
     }
-    swap(a->cube[FRONT][0], a->cube[LEFT][0]);
-    swap(a->cube[FRONT][0], a->cube[BACK][2]);
-    swap(a->cube[FRONT][0], a->cube[RIGHT][0]);
+    // print_cube(temp);
+    swap(temp->cube[FRONT][0], temp->cube[LEFT][0]);
+    swap(temp->cube[FRONT][0], temp->cube[BACK][2]);
+    swap(temp->cube[FRONT][0], temp->cube[RIGHT][0]);
     
     swap(temp->cube[TOP][0][0], temp->cube[TOP][2][0]);
     swap(temp->cube[TOP][0][0], temp->cube[TOP][2][2]);
@@ -307,8 +314,8 @@ Element* DecisionTree::makeTLnode(Element *a) {
 
     swap(temp->cube[TOP][0][1], temp->cube[TOP][1][0]);
     swap(temp->cube[TOP][0][1], temp->cube[TOP][2][1]);
-    swap(temp->cube[TOP][0][1], temp->cube[TOP][0][2]);
-
+    swap(temp->cube[TOP][0][1], temp->cube[TOP][1][2]);
+    // print_cube(temp);
     return temp;
 
 }
@@ -321,6 +328,7 @@ Element* DecisionTree::makeRUnode(Element *a) {
             }
         }
     }
+    // print_cube(temp);
     swap(temp->cube[FRONT][0][2], temp->cube[TOP][0][2]);
     swap(temp->cube[FRONT][0][2], temp->cube[BACK][0][2]);
     swap(temp->cube[FRONT][0][2], temp->cube[BOTTOM][0][2]);
@@ -333,14 +341,14 @@ Element* DecisionTree::makeRUnode(Element *a) {
     swap(temp->cube[FRONT][2][2], temp->cube[BACK][2][2]);
     swap(temp->cube[FRONT][2][2], temp->cube[BOTTOM][2][2]);
 
-    swap(temp->cube[RIGHT][0][0], temp->cube[RIGHT][2][0]);
-    swap(temp->cube[RIGHT][0][0], temp->cube[RIGHT][2][2]);
     swap(temp->cube[RIGHT][0][0], temp->cube[RIGHT][0][2]);
+    swap(temp->cube[RIGHT][0][0], temp->cube[RIGHT][2][2]);
+    swap(temp->cube[RIGHT][0][0], temp->cube[RIGHT][2][0]);
 
-    swap(temp->cube[RIGHT][0][1], temp->cube[RIGHT][1][0]);
+    swap(temp->cube[RIGHT][0][1], temp->cube[RIGHT][1][2]);
     swap(temp->cube[RIGHT][0][1], temp->cube[RIGHT][2][1]);
-    swap(temp->cube[RIGHT][0][1], temp->cube[RIGHT][0][2]);
-
+    swap(temp->cube[RIGHT][0][1], temp->cube[RIGHT][1][0]);
+    // print_cube(temp);
     return temp;
 
 }
@@ -365,13 +373,13 @@ Element* DecisionTree::makeRDnode(Element *a) {
     swap(temp->cube[FRONT][2][2], temp->cube[BACK][2][2]);
     swap(temp->cube[FRONT][2][2], temp->cube[TOP][2][2]);
 
-    swap(temp->cube[RIGHT][0][0], temp->cube[RIGHT][0][2]);
-    swap(temp->cube[RIGHT][0][0], temp->cube[RIGHT][2][2]);
     swap(temp->cube[RIGHT][0][0], temp->cube[RIGHT][2][0]);
+    swap(temp->cube[RIGHT][0][0], temp->cube[RIGHT][2][2]);
+    swap(temp->cube[RIGHT][0][0], temp->cube[RIGHT][0][2]);
 
-    swap(temp->cube[RIGHT][0][1], temp->cube[RIGHT][0][2]);
-    swap(temp->cube[RIGHT][0][1], temp->cube[RIGHT][2][1]);
     swap(temp->cube[RIGHT][0][1], temp->cube[RIGHT][1][0]);
+    swap(temp->cube[RIGHT][0][1], temp->cube[RIGHT][2][1]);
+    swap(temp->cube[RIGHT][0][1], temp->cube[RIGHT][1][2]);
 
     return temp;
 
@@ -385,6 +393,7 @@ Element* DecisionTree::makeLUnode(Element *a) {
             }
         }
     }
+    // print_cube(temp);
     swap(temp->cube[FRONT][0][0], temp->cube[TOP][0][0]);
     swap(temp->cube[FRONT][0][0], temp->cube[BACK][0][0]);
     swap(temp->cube[FRONT][0][0], temp->cube[BOTTOM][0][0]);
@@ -403,8 +412,8 @@ Element* DecisionTree::makeLUnode(Element *a) {
 
     swap(temp->cube[LEFT][0][1], temp->cube[LEFT][1][0]);
     swap(temp->cube[LEFT][0][1], temp->cube[LEFT][2][1]);
-    swap(temp->cube[LEFT][0][1], temp->cube[LEFT][0][2]);
-
+    swap(temp->cube[LEFT][0][1], temp->cube[LEFT][1][2]);
+    // print_cube(temp);
     return temp;
 }
 Element* DecisionTree::makeLDnode(Element *a) {
@@ -416,6 +425,7 @@ Element* DecisionTree::makeLDnode(Element *a) {
             }
         }
     }
+    // print_cube(temp);
     swap(temp->cube[FRONT][0][0], temp->cube[BOTTOM][0][0]);
     swap(temp->cube[FRONT][0][0], temp->cube[BACK][0][0]);
     swap(temp->cube[FRONT][0][0], temp->cube[TOP][0][0]);
@@ -432,9 +442,10 @@ Element* DecisionTree::makeLDnode(Element *a) {
     swap(temp->cube[LEFT][0][0], temp->cube[LEFT][2][2]);
     swap(temp->cube[LEFT][0][0], temp->cube[LEFT][2][0]);
 
-    swap(temp->cube[LEFT][0][1], temp->cube[LEFT][0][2]);
+    swap(temp->cube[LEFT][0][1], temp->cube[LEFT][1][2]);
     swap(temp->cube[LEFT][0][1], temp->cube[LEFT][2][1]);
     swap(temp->cube[LEFT][0][1], temp->cube[LEFT][1][0]);
+    // print_cube(temp);
     return temp;
 }
 Element* DecisionTree::makeBRnode(Element *a) {
@@ -446,8 +457,9 @@ Element* DecisionTree::makeBRnode(Element *a) {
             }
         }
     }
+    // print_cube(temp);
     swap(temp->cube[FRONT][2], temp->cube[RIGHT][2]);
-    swap(temp->cube[FRONT][2], temp->cube[BACK][2]);
+    swap(temp->cube[FRONT][2], temp->cube[BACK][0]);
     swap(temp->cube[FRONT][2], temp->cube[LEFT][2]);
 
     swap(temp->cube[BOTTOM][0][0], temp->cube[BOTTOM][0][2]);
@@ -457,7 +469,7 @@ Element* DecisionTree::makeBRnode(Element *a) {
     swap(temp->cube[BOTTOM][0][1], temp->cube[BOTTOM][1][2]);
     swap(temp->cube[BOTTOM][0][1], temp->cube[BOTTOM][2][1]);
     swap(temp->cube[BOTTOM][0][1], temp->cube[BOTTOM][1][0]);
-
+    // print_cube(temp);
     return temp;
 }
 Element* DecisionTree::makeBLnode(Element *a) {
@@ -470,7 +482,7 @@ Element* DecisionTree::makeBLnode(Element *a) {
         }
     }
     swap(a->cube[FRONT][2], a->cube[LEFT][2]);
-    swap(a->cube[FRONT][2], a->cube[BACK][2]);
+    swap(a->cube[FRONT][2], a->cube[BACK][0]);
     swap(a->cube[FRONT][2], a->cube[RIGHT][2]);
     
     swap(temp->cube[BOTTOM][0][0], temp->cube[BOTTOM][2][0]);
@@ -479,7 +491,7 @@ Element* DecisionTree::makeBLnode(Element *a) {
 
     swap(temp->cube[BOTTOM][0][1], temp->cube[BOTTOM][1][0]);
     swap(temp->cube[BOTTOM][0][1], temp->cube[BOTTOM][2][1]);
-    swap(temp->cube[BOTTOM][0][1], temp->cube[BOTTOM][0][2]);
+    swap(temp->cube[BOTTOM][0][1], temp->cube[BOTTOM][1][2]);
 
     return temp;
 
@@ -493,13 +505,14 @@ Element* DecisionTree::makeFCnode(Element *a) {
             }
         }
     }
-    swap(temp->cube[FRONT][0][0], temp->cube[FRONT][2][0]);
-    swap(temp->cube[FRONT][0][0], temp->cube[FRONT][2][2]);
+    // print_cube(temp);
     swap(temp->cube[FRONT][0][0], temp->cube[FRONT][0][2]);
+    swap(temp->cube[FRONT][0][0], temp->cube[FRONT][2][2]);
+    swap(temp->cube[FRONT][0][0], temp->cube[FRONT][2][0]);
 
-    swap(temp->cube[FRONT][0][1], temp->cube[FRONT][1][0]);
+    swap(temp->cube[FRONT][0][1], temp->cube[FRONT][1][2]);
     swap(temp->cube[FRONT][0][1], temp->cube[FRONT][2][1]);
-    swap(temp->cube[FRONT][0][1], temp->cube[FRONT][0][2]);
+    swap(temp->cube[FRONT][0][1], temp->cube[FRONT][1][0]);
 
     swap(temp->cube[TOP][2][0], temp->cube[RIGHT][0][0]);
     swap(temp->cube[TOP][2][0], temp->cube[BOTTOM][0][2]);
@@ -512,6 +525,7 @@ Element* DecisionTree::makeFCnode(Element *a) {
     swap(temp->cube[TOP][2][2], temp->cube[RIGHT][2][0]);
     swap(temp->cube[TOP][2][2], temp->cube[BOTTOM][0][0]);
     swap(temp->cube[TOP][2][2], temp->cube[LEFT][0][2]);
+    // print_cube(temp);
     return temp;
 }
 Element* DecisionTree::makeFAnode(Element *a) {
@@ -523,13 +537,14 @@ Element* DecisionTree::makeFAnode(Element *a) {
             }
         }
     }
-    swap(temp->cube[FRONT][0][0], temp->cube[FRONT][0][2]);
-    swap(temp->cube[FRONT][0][0], temp->cube[FRONT][2][2]);
+    // print_cube(temp);
     swap(temp->cube[FRONT][0][0], temp->cube[FRONT][2][0]);
+    swap(temp->cube[FRONT][0][0], temp->cube[FRONT][2][2]);
+    swap(temp->cube[FRONT][0][0], temp->cube[FRONT][0][2]);
 
-    swap(temp->cube[FRONT][0][1], temp->cube[FRONT][0][2]);
-    swap(temp->cube[FRONT][0][1], temp->cube[FRONT][2][1]);
     swap(temp->cube[FRONT][0][1], temp->cube[FRONT][1][0]);
+    swap(temp->cube[FRONT][0][1], temp->cube[FRONT][2][1]);
+    swap(temp->cube[FRONT][0][1], temp->cube[FRONT][1][2]);
 
     swap(temp->cube[TOP][2][0], temp->cube[LEFT][2][2]);
     swap(temp->cube[TOP][2][0], temp->cube[BOTTOM][0][2]);
@@ -542,6 +557,7 @@ Element* DecisionTree::makeFAnode(Element *a) {
     swap(temp->cube[TOP][2][2], temp->cube[LEFT][0][2]);
     swap(temp->cube[TOP][2][2], temp->cube[BOTTOM][0][0]);
     swap(temp->cube[TOP][2][2], temp->cube[RIGHT][2][0]);
+    // print_cube(temp);
     return temp;
 }
 Element* DecisionTree::makeBCnode(Element *a) {
@@ -553,25 +569,27 @@ Element* DecisionTree::makeBCnode(Element *a) {
             }
         }
     }
+    // print_cube(temp);
     swap(temp->cube[BACK][0][0], temp->cube[BACK][2][0]);
     swap(temp->cube[BACK][0][0], temp->cube[BACK][2][2]);
     swap(temp->cube[BACK][0][0], temp->cube[BACK][0][2]);
 
     swap(temp->cube[BACK][0][1], temp->cube[BACK][1][0]);
     swap(temp->cube[BACK][0][1], temp->cube[BACK][2][1]);
-    swap(temp->cube[BACK][0][1], temp->cube[BACK][0][2]);
+    swap(temp->cube[BACK][0][1], temp->cube[BACK][1][2]);
 
-    swap(temp->cube[TOP][0][0], temp->cube[LEFT][2][0]);
-    swap(temp->cube[TOP][0][0], temp->cube[BOTTOM][2][2]);
     swap(temp->cube[TOP][0][0], temp->cube[RIGHT][0][2]);
+    swap(temp->cube[TOP][0][0], temp->cube[BOTTOM][2][2]);
+    swap(temp->cube[TOP][0][0], temp->cube[LEFT][2][0]);
 
-    swap(temp->cube[TOP][0][1], temp->cube[LEFT][1][0]);
-    swap(temp->cube[TOP][0][1], temp->cube[BOTTOM][2][1]);
     swap(temp->cube[TOP][0][1], temp->cube[RIGHT][1][2]);
+    swap(temp->cube[TOP][0][1], temp->cube[BOTTOM][2][1]);
+    swap(temp->cube[TOP][0][1], temp->cube[LEFT][1][0]);
 
-    swap(temp->cube[TOP][0][2], temp->cube[LEFT][0][0]);
-    swap(temp->cube[TOP][0][2], temp->cube[BOTTOM][2][0]);
     swap(temp->cube[TOP][0][2], temp->cube[RIGHT][2][2]);
+    swap(temp->cube[TOP][0][2], temp->cube[BOTTOM][2][0]);
+    swap(temp->cube[TOP][0][2], temp->cube[LEFT][0][0]);
+    // print_cube(temp);
     return temp;
 }
 Element* DecisionTree::makeBAnode(Element *a) {
@@ -583,38 +601,81 @@ Element* DecisionTree::makeBAnode(Element *a) {
             }
         }
     }
+    // print_cube(temp);
     swap(temp->cube[BACK][0][0], temp->cube[BACK][0][2]);
     swap(temp->cube[BACK][0][0], temp->cube[BACK][2][2]);
     swap(temp->cube[BACK][0][0], temp->cube[BACK][2][0]);
 
-    swap(temp->cube[BACK][0][1], temp->cube[BACK][0][2]);
+    swap(temp->cube[BACK][0][1], temp->cube[BACK][1][2]);
     swap(temp->cube[BACK][0][1], temp->cube[BACK][2][1]);
     swap(temp->cube[BACK][0][1], temp->cube[BACK][1][0]);
 
-    swap(temp->cube[TOP][0][0], temp->cube[RIGHT][0][2]);
-    swap(temp->cube[TOP][0][0], temp->cube[BOTTOM][2][2]);
     swap(temp->cube[TOP][0][0], temp->cube[LEFT][2][0]);
+    swap(temp->cube[TOP][0][0], temp->cube[BOTTOM][2][2]);
+    swap(temp->cube[TOP][0][0], temp->cube[RIGHT][0][2]);
 
-    swap(temp->cube[TOP][0][1], temp->cube[RIGHT][1][2]);
-    swap(temp->cube[TOP][0][1], temp->cube[BOTTOM][2][1]);
     swap(temp->cube[TOP][0][1], temp->cube[LEFT][1][0]);
+    swap(temp->cube[TOP][0][1], temp->cube[BOTTOM][2][1]);
+    swap(temp->cube[TOP][0][1], temp->cube[RIGHT][1][2]);
 
-    swap(temp->cube[TOP][0][2], temp->cube[RIGHT][2][2]);
-    swap(temp->cube[TOP][0][2], temp->cube[BOTTOM][2][0]);
     swap(temp->cube[TOP][0][2], temp->cube[LEFT][0][0]);
+    swap(temp->cube[TOP][0][2], temp->cube[BOTTOM][2][0]);
+    swap(temp->cube[TOP][0][2], temp->cube[RIGHT][2][2]);
+
+//    print_cube(temp);
     return temp;
 }
 
 void DecisionTree::print_cube (Element * node) {
     int i, j, k;
     for (i = 0; i < 6; i++) {
+        switch(i) {
+            case 0:
+                cout << "front side" << endl;
+                break;
+            case 1:
+                cout << "back side" << endl;
+                break;
+            case 2:
+                cout << "left side" << endl;
+                break;
+            case 3:
+                cout << "right side" << endl;
+                break;
+            case 4:
+                cout << "top side" << endl;
+                break;
+            case 5:
+                cout << "bottom side" << endl;
+                break;
+        }
         for (j = 0; j < 3; j++) {
             for (k = 0; k < 3; k++) {
-                cout << node->cube[i][j][k] << " ";
+                switch(node->cube[i][j][k]) {
+                    case 0:
+                        cout << "W ";
+                        break;
+                    case 1:
+                        cout << "G ";
+                        break;
+                    case 2:
+                        cout << "R ";
+                        break;
+                    case 3:
+                        cout << "B ";
+                        break;
+                    case 4:
+                        cout << "O ";
+                        break;
+                    case 5:
+                        cout << "Y ";
+                        break;
+                }
             }
             cout << endl;
         }
-        cout << endl;
+        cout <<endl;
     }
+    cout << "------------------------------" << endl;
 }
 
