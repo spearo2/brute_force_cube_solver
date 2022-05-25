@@ -1,6 +1,8 @@
 #include <iostream>
+#include <thread>
 #include "decisionTree.h"
 using namespace std;
+
 
 
 #define WHITE 0
@@ -10,14 +12,30 @@ using namespace std;
 #define ORANGE  4
 #define YELLOW  5
 
-
+DecisionTree graph;
 void makeIntro();
 int fillUpCube(Element *a, string input[6]);
 void makeTestCase (string input[6]);
+bool Print_thread();
+void inorder_print_thread(Element* ptr, int index);
+bool returned = false;
 
 
 
 int main(int argc, char *argv[]) {
+    bool d_flag = false;
+    bool t_flag = false;
+
+    if (argc == 2) {
+        if (argv[1] == string("-d")) {
+            d_flag = true;
+        } else if (argv[1] == string("-t")) {
+            t_flag = true;
+        } else {
+            cout << "Invalid argument" << endl;
+            return 0;
+        }
+    }
    
     Element* a = new Element(-1);
     makeIntro();
@@ -36,27 +54,137 @@ int main(int argc, char *argv[]) {
     // cin >> input[BOTTOM];
     makeTestCase(input);
     fillUpCube(a, input);
-    DecisionTree graph;
+
     graph.root = a;
-    //graph.makeTRnode(a);
-     while (!graph.Print()) {
-         graph.make_decision(a);
-     }
-        
-    // int i, j, k;
-    // for (i = 0; i < 6; i++) {
-    //     for (j = 0; j < 3; j++) {
-    //         for (k = 0; k < 3; k++) {
-    //             cout << graph.root->cube[i][j][k] << " ";
-                
-    //         }
-    //     }
-    // }
+    if (d_flag) {
+        graph.d_flag = true;
+    } else if (t_flag) {
+        graph.t_flag = true;
+    }
+
+
+
+    if (t_flag) {
+        while (!Print_thread()) {
+        graph.make_decision(graph.root);
+    }
+            
+       
+    } else {
+        while (!graph.Print()) {
+            graph.make_decision(a);
+        }
+    }
+    
     return 0;
 
 
 }
 
+bool Print_thread() {
+        thread thread0(inorder_print_thread,graph.root,0);        
+        thread thread1(inorder_print_thread,graph.root,1);
+        thread thread2(inorder_print_thread,graph.root,2);
+        thread thread3(inorder_print_thread,graph.root,3);
+        thread thread4(inorder_print_thread,graph.root,4);
+        thread thread5(inorder_print_thread,graph.root,5);
+        thread thread6(inorder_print_thread,graph.root,6);
+        thread thread7(inorder_print_thread,graph.root,7);
+        thread thread8(inorder_print_thread,graph.root,8);
+        thread thread9(inorder_print_thread,graph.root,9);
+        thread thread10(inorder_print_thread,graph.root,10);
+        thread thread11(inorder_print_thread,graph.root,11);
+        
+        thread0.join();
+        thread1.join();
+        thread2.join();
+        thread3.join();
+        thread4.join();
+        thread5.join();
+        thread6.join();
+        thread7.join();
+        thread8.join();
+        thread9.join();
+        thread10.join();
+        thread11.join();
+        if (returned) {
+            return true;
+        } else {
+            return false;
+        }
+
+}
+
+void inorder_print_thread(Element* ptr, int index) {
+    if (ptr) {
+        if(returned)
+            return;
+        int i = index;
+            if (graph.inorder_print(ptr->childs[i])) {
+                graph.solution.push(ptr->previousRotate);
+            }
+
+            if (ptr->childs[i] == NULL) {
+                
+                if (graph.check_cube(ptr)) {
+                    returned = true;
+                    graph.solution.push(ptr->previousRotate);
+                    //print_cube(ptr);
+                    return;
+                }
+            }
+    }
+    if(returned) {
+        cout << "solution found!" <<endl;
+        int temp = graph.solution.size();
+        for(int i = 0; i < temp; i++) {
+            switch(graph.solution.top()) {
+                case 6:
+                    cout << "TL ";
+                    break;
+                case 7:
+                    cout << "TR ";
+                    break;
+                case 8:
+                    cout << "BL ";
+                    break;
+                case 9:
+                    cout << "BR ";
+                    break;
+                case 10:
+                    cout << "RU ";
+                    break;
+                case 11:
+                    cout << "RD ";
+                    break;
+                case 12:
+                    cout << "LU ";
+                    break;
+                case 13:
+                    cout << "LD ";
+                    break;
+                case 14:
+                    cout << "FC ";
+                    break;
+                case 15:
+                    cout << "FA ";
+                    break;
+                case 16:
+                    cout << "BC ";
+                    break;
+                case 17:
+                    cout << "BA ";
+                    break;
+                default:
+                    cout << "";
+                    break;
+            }
+            graph.solution.pop();
+        }
+    exit(1);
+    } 
+    return;
+}
 
 int fillUpCube(Element *a, string input[6]) {
 
@@ -155,26 +283,43 @@ void makeTestCase (string input[6]) {
 
 
     //FC
-    input[0] = "ooooooooo";
-    input[1] = "rrrrrrrrr";
-    input[2] = "wwbwwbwwb";
-    input[3] = "gyygyygyy";
-    input[4] = "ggggggwww";
-    input[5] = "yyybbbbbb";
-
-    //Complete
     // input[0] = "ooooooooo";
     // input[1] = "rrrrrrrrr";
-    // input[2] = "wwwwwwwww";
-    // input[3] = "yyyyyyyyy";
-    // input[4] = "ggggggggg";
-    // input[5] = "bbbbbbbbb";
+    // input[2] = "wwbwwbwwb";
+    // input[3] = "gyygyygyy";
+    // input[4] = "ggggggwww";
+    // input[5] = "yyybbbbbb";
 
-    // input[0] = "yyyooboob";
-    // input[1] = "rrgrrgwww";
-    // input[2] = "oobwwwwww";
-    // input[3] = "grryyyyyy";
-    // input[4] = "ggggggooo";
-    // input[5] = "bbrbbrbbr";
+    //Complete
+    input[0] = "ooooooooo";
+    input[1] = "rrrrrrrrr";
+    input[2] = "wwwwwwwww";
+    input[3] = "yyyyyyyyy";
+    input[4] = "ggggggggg";
+    input[5] = "bbbbbbbbb";
+
+    //TRRD
+    // input[0] = "wwgoogoog";
+    // input[1] = "rrbrrbyyb";
+    // input[2] = "rrrwwwwww";
+    // input[3] = "oyyoyyoyy";
+    // input[4] = "ggrggrggy";
+    // input[5] = "bbwbbobbo";
+
+    //TRRDBR
+    // input[0] = "wwgoogwww";
+    // input[1] = "yyorrbyyb";
+    // input[2] = "rrrwwwbrr";
+    // input[3] = "oyyoyyoog";
+    // input[4] = "ggrggrggy";
+    // input[5] = "bbbbbboow";
+
+    //TRLUBCBL
+    input[0] = "ybbyooggw";
+    input[1] = "bbyrrgwww";
+    input[2] = "gbbybbyoo";
+    input[3] = "oobggwgrr";
+    input[4] = "rrrowwoww";
+    input[5] = "yyoyygrrg";
 }
 
