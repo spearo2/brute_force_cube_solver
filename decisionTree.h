@@ -198,7 +198,19 @@ bool DecisionTree::check_cube(Element *ptr) {
 }
 
 void DecisionTree::make_decision(Element *ptr) {
-   
+    char say_yes_or_no;
+    if (depth == 10 || depth == 5 || depth == 15 || depth == 20) {
+        while (true) {
+            cout << "Solution has not found within " << depth << " roatations" << endl << "Do you want to continue? (y/n)" << endl;
+            cin >> say_yes_or_no;
+            if (say_yes_or_no == 'n') {
+                exit(1);
+            } else if (say_yes_or_no == 'y') {
+                break;
+            }
+        }
+    }
+
     cout<<"browsing "<<depth<<" rotation"<<endl;
    
     depth++;

@@ -1,9 +1,11 @@
+/*
+compile with g++ main.cpp -std=c++11 -pthread
+*/
+
 #include <iostream>
 #include <thread>
 #include "decisionTree.h"
 using namespace std;
-
-
 
 #define WHITE 0
 #define GREEN 1
@@ -13,18 +15,21 @@ using namespace std;
 #define YELLOW  5
 
 DecisionTree graph;
+bool d_flag = false;
+bool t_flag = false;
 void makeIntro();
 int fillUpCube(Element *a, string input[6]);
 void makeTestCase (string input[6]);
 bool Print_thread();
-void inorder_print_thread(Element* ptr, int index);
+void thread_Print(int index);
+bool inorder_print_thread(Element* ptr, int index);
 bool returned = false;
+void signal_found();
 
 
 
 int main(int argc, char *argv[]) {
-    bool d_flag = false;
-    bool t_flag = false;
+    
 
     if (argc == 2) {
         if (argv[1] == string("-d")) {
@@ -40,21 +45,27 @@ int main(int argc, char *argv[]) {
     Element* a = new Element(-1);
     makeIntro();
     string input[6];
-    // cout << endl <<"Enter the color of the FRONT side of your current cube state: ";
-    // cin >> input[FRONT];
-    // cout << endl <<"Enter the color of the BACK side of your current cube state: ";
-    // cin >> input[BACK];
-    // cout << endl <<"Enter the color of the LEFT side of your current cube state: ";
-    // cin >> input[LEFT];
-    // cout << endl <<"Enter the color of the RIGHT side of your current cube state: ";
-    // cin >> input[RIGHT];
-    // cout << endl <<"Enter the color of the TOP side of your current cube state: ";
-    // cin >> input[TOP];
-    // cout << endl <<"Enter the color of the BOTTOM side of your current cube state: ";
-    // cin >> input[BOTTOM];
-    makeTestCase(input);
-    fillUpCube(a, input);
+    
+    /* 
+    If you want to test the program, and you don't have cube in your hand mute 51~62 lines and use the makeTestCase(input) function
+    */
 
+    cout << endl <<"Enter the color of the FRONT side of your current cube state: ";
+    cin >> input[FRONT];
+    cout << endl <<"Enter the color of the BACK side of your current cube state: ";
+    cin >> input[BACK];
+    cout << endl <<"Enter the color of the LEFT side of your current cube state: ";
+    cin >> input[LEFT];
+    cout << endl <<"Enter the color of the RIGHT side of your current cube state: ";
+    cin >> input[RIGHT];
+    cout << endl <<"Enter the color of the TOP side of your current cube state: ";
+    cin >> input[TOP];
+    cout << endl <<"Enter the color of the BOTTOM side of your current cube state: ";
+    cin >> input[BOTTOM];
+    
+    //makeTestCase(input); // unmute this to use the test case
+    fillUpCube(a, input);
+    
     graph.root = a;
     if (d_flag) {
         graph.d_flag = true;
@@ -63,38 +74,39 @@ int main(int argc, char *argv[]) {
     }
 
 
+    thread thread_terminate(signal_found);
+    if (!t_flag)
+        thread_terminate.detach();
 
     if (t_flag) {
         while (!Print_thread()) {
         graph.make_decision(graph.root);
-    }
-            
-       
+        } 
     } else {
         while (!graph.Print()) {
             graph.make_decision(a);
         }
     }
-    
+    if (t_flag)
+        thread_terminate.join();
     return 0;
 
 
 }
 
 bool Print_thread() {
-        thread thread0(inorder_print_thread,graph.root,0);        
-        thread thread1(inorder_print_thread,graph.root,1);
-        thread thread2(inorder_print_thread,graph.root,2);
-        thread thread3(inorder_print_thread,graph.root,3);
-        thread thread4(inorder_print_thread,graph.root,4);
-        thread thread5(inorder_print_thread,graph.root,5);
-        thread thread6(inorder_print_thread,graph.root,6);
-        thread thread7(inorder_print_thread,graph.root,7);
-        thread thread8(inorder_print_thread,graph.root,8);
-        thread thread9(inorder_print_thread,graph.root,9);
-        thread thread10(inorder_print_thread,graph.root,10);
-        thread thread11(inorder_print_thread,graph.root,11);
-        
+        thread thread0(thread_Print,0);        
+        thread thread1(thread_Print,1);
+        thread thread2(thread_Print,2);
+        thread thread3(thread_Print,3);
+        thread thread4(thread_Print,4);
+        thread thread5(thread_Print,5);
+        thread thread6(thread_Print,6);
+        thread thread7(thread_Print,7);
+        thread thread8(thread_Print,8);
+        thread thread9(thread_Print,9);
+        thread thread10(thread_Print,10);
+        thread thread11(thread_Print,11);
         thread0.join();
         thread1.join();
         thread2.join();
@@ -114,27 +126,16 @@ bool Print_thread() {
         }
 
 }
+void signal_found() {
+    if (t_flag)
+        return;
+    while (!returned);
+    exit(1);
+        
+}
 
-void inorder_print_thread(Element* ptr, int index) {
-    if (ptr) {
-        if(returned)
-            return;
-        int i = index;
-            if (graph.inorder_print(ptr->childs[i])) {
-                graph.solution.push(ptr->previousRotate);
-            }
-
-            if (ptr->childs[i] == NULL) {
-                
-                if (graph.check_cube(ptr)) {
-                    returned = true;
-                    graph.solution.push(ptr->previousRotate);
-                    //print_cube(ptr);
-                    return;
-                }
-            }
-    }
-    if(returned) {
+void thread_Print(int index) {
+    if(inorder_print_thread(graph.root,index)) {
         cout << "solution found!" <<endl;
         int temp = graph.solution.size();
         for(int i = 0; i < temp; i++) {
@@ -181,9 +182,29 @@ void inorder_print_thread(Element* ptr, int index) {
             }
             graph.solution.pop();
         }
-    exit(1);
+    returned = true;
     } 
     return;
+}
+
+bool inorder_print_thread(Element* ptr, int index) {
+    if (ptr) {
+        int i = index;
+            if (graph.inorder_print(ptr->childs[i])) {
+                graph.solution.push(ptr->previousRotate);
+                return true;
+            }
+
+            if (ptr->childs[i] == NULL) {
+                if (graph.check_cube(ptr)) {
+                    returned = true;
+                    graph.solution.push(ptr->previousRotate);
+                    //print_cube(ptr);
+                    return true;
+                }
+            }
+    }
+    return false;
 }
 
 int fillUpCube(Element *a, string input[6]) {
@@ -230,17 +251,22 @@ void makeIntro () {
     cout<<"  _ _ _"<<endl<<" |1|2|3|"<<endl<<"  _ _ _"<<endl<<" |4|5|6|"<<endl<<"  _ _ _"<<endl<<" |7|8|9|"<<endl<<"  _ _ _"<<endl;
     cout<<endl<<"Red: r, Green: g, Blue: b, Orange: o, Yellow: y, White: w"<<endl;
     cout<<"Please dont't type any spaces between colors"<<endl;
+
+    if (t_flag)
+        cout<<"thread mode selected!"<<endl;
+    else if (d_flag)
+        cout<<"display mode selected!"<<endl << "performance may decrease"<<endl;
 }
 
 
 
 void makeTestCase (string input[6]) {
-    // input[0] = "rogbgybwr";
-    // input[1] = "wyogbwgrw";
-    // input[2] = "ywbborogy";
-    // input[3] = "wwbbrogry";
-    // input[4] = "gorowrybo";
-    // input[5] = "ogwyygbyr";
+    input[0] = "rogbgybwr";
+    input[1] = "wyogbwgrw";
+    input[2] = "ywbborogy";
+    input[3] = "wwbbrogry";
+    input[4] = "gorowrybo";
+    input[5] = "ogwyygbyr";
     // //TR
     // input[0] = "wwwoooooo";
     // input[1] = "rrrrrryyy";
@@ -291,12 +317,12 @@ void makeTestCase (string input[6]) {
     // input[5] = "yyybbbbbb";
 
     //Complete
-    input[0] = "ooooooooo";
-    input[1] = "rrrrrrrrr";
-    input[2] = "wwwwwwwww";
-    input[3] = "yyyyyyyyy";
-    input[4] = "ggggggggg";
-    input[5] = "bbbbbbbbb";
+    // input[0] = "ooooooooo";
+    // input[1] = "rrrrrrrrr";
+    // input[2] = "wwwwwwwww";
+    // input[3] = "yyyyyyyyy";
+    // input[4] = "ggggggggg";
+    // input[5] = "bbbbbbbbb";
 
     //TRRD
     // input[0] = "wwgoogoog";
@@ -306,20 +332,36 @@ void makeTestCase (string input[6]) {
     // input[4] = "ggrggrggy";
     // input[5] = "bbwbbobbo";
 
-    //TRRDBR
-    // input[0] = "wwgoogwww";
-    // input[1] = "yyorrbyyb";
-    // input[2] = "rrrwwwbrr";
-    // input[3] = "oyyoyyoog";
-    // input[4] = "ggrggrggy";
-    // input[5] = "bbbbbboow";
+    //FA DL RU FC
+    // input[0] = "booyoobbb";
+    // input[1] = "gwgrrgrry";
+    // input[2] = "wwwwwboow";
+    // input[3] = "ybbyyyyyy";
+    // input[4] = "ggoggoogg";
+    // input[5] = "rrrwbrwbr";
 
-    //TRLUBCBL
-    input[0] = "ybbyooggw";
-    input[1] = "bbyrrgwww";
-    input[2] = "gbbybbyoo";
-    input[3] = "oobggwgrr";
-    input[4] = "rrrowwoww";
-    input[5] = "yyoyygrrg";
+    //TR LU BC BL
+    // input[0] = "ybbyooggw";
+    // input[1] = "bbyrrgwww";
+    // input[2] = "gbbybbyoo";
+    // input[3] = "oobggwgrr";
+    // input[4] = "rrrowwoww";
+    // input[5] = "yyoyygrrg";
+
+    //random 5
+    // input[0] = "booyooyyy";
+    // input[1] = "woorrgrry";
+    // input[2] = "wwwwwbbbb";
+    // input[3] = "ybbyyygwg";
+    // input[4] = "ggoggoogg";
+    // input[5] = "rrrrbbrww";
+
+    // //RU TL BR LU BL FA
+    // input[0] = "ybgyoybby";
+    // input[1] = "rbbgrworw";
+    // input[2] = "bwoowoyoo";
+    // input[3] = "rrgrygrgw";
+    // input[4] = "ywoogggyw";
+    // input[5] = "wwbbbygrr";
 }
 
